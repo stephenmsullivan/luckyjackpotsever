@@ -7,9 +7,9 @@ import (
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
-func CreateLeaderboard(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, initializer runtime.Initializer) error {
+func CreateLeaderboard(name string, ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, initializer runtime.Initializer) error {
 
-	id := "multihandpoker_jackpots"
+	id := name
 	authoritative := false
 	sort := "desc"
 	operator := "set"
