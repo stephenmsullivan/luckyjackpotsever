@@ -13,6 +13,7 @@ func InitModule(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runti
 	// Create all the leaderboards
 	CreateLeaderboard("multihandpoker_jackpots", ctx, logger, db, nk, initializer)
 	CreateLeaderboard("videopokercasino_jackpots", ctx, logger, db, nk, initializer)
+	CreateLeaderboard("kenocasino_jackpots", ctx, logger, db, nk, initializer)
 
 	return nil
 }
