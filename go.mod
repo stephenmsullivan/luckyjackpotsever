@@ -1,10 +1,10 @@
 module luckyjackpotcasino.com/luckyjackpotserver
 
-go 1.19
+go 1.21
 
 require (
-	github.com/google/uuid v1.4.0
-	github.com/heroiclabs/nakama-common v1.30.0
+	github.com/gofrs/uuid/v5 v5.2.0
+	github.com/heroiclabs/nakama-common v1.32.1
 )
 
-require google.golang.org/protobuf v1.31.0 // indirect
+require google.golang.org/protobuf v1.34.1 // indirect
