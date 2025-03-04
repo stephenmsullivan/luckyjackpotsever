@@ -4,9 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
-	"math/rand"
-	"strconv"
 
 	"github.com/heroiclabs/nakama-common/runtime"
 )
@@ -27,38 +24,6 @@ func InitModule(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runti
 	initializer.RegisterBeforeGetAccount(beforeGetAccount)
 
 	return nil
-}
-
-// generateReferralCode generates a random 8-digit referral code as a string.
-func generateReferralCode() string {
-	// Generate a random number between 10000000 and 99999999.
-	num := rand.Intn(90000000) + 10000000
-	return strconv.Itoa(num)
-}
-
-// generateUniqueReferralCode generates an 8-digit referral code and ensures it is unique
-// by checking the "referral_codes" storage collection.
-func generateUniqueReferralCode(ctx context.Context, logger runtime.Logger, nk runtime.NakamaModule, maxAttempts int) (string, error) {
-	for i := 0; i < maxAttempts; i++ {
-		// Generate a random 8-digit number as a string.
-		code := generateReferralCode() // e.g., returns something like "12345678"
-
-		// Use the StorageRead API to check if this referral code already exists.
-		records, err := nk.StorageRead(ctx, []*runtime.StorageRead{{
-			Collection: "referral_codes",
-			Key:        code,
-		}})
-		if err != nil {
-			logger.Error("Error reading storage for referral code '%s': %v", code, err)
-			continue // In case of an error, try again.
-		}
-
-		// If no records are found, the code is unique.
-		if len(records) == 0 {
-			return code, nil
-		}
-	}
-	return "", fmt.Errorf("failed to generate a unique referral code after %d attempts", maxAttempts)
 }
 
 // beforeGetAccount is a hook that runs before the GetAccount function.
