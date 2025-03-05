@@ -75,9 +75,8 @@ func beforeGetAccount(ctx context.Context, logger runtime.Logger, db *sql.DB, nk
 			Collection:      "referral_codes",
 			Key:             newCode,
 			PermissionRead:  1,
-			PermissionWrite: 1,
+			PermissionWrite: 0,
 			Value:           `{"userId":"` + userID + `"}`,
-			UserID:          userID,
 		},
 	}); err != nil {
 		logger.Error("sessionCreated: error writing referral code to storage: %v", err)
