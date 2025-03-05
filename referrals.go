@@ -13,7 +13,7 @@ import (
 
 // lookupUserByReferral is an RPC function that looks up a user by referral code.
 // It expects a JSON payload like: {"referralCode": "12345678"}.
-func lookupUserByReferral(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, payload string) (string, error) {
+func LookupUserByReferral(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, payload string) (string, error) {
 	// Define a structure for the incoming JSON payload.
 	var input struct {
 		ReferralCode string `json:"referralCode"`
@@ -61,6 +61,20 @@ func lookupUserByReferral(ctx context.Context, logger runtime.Logger, db *sql.DB
 	if err != nil {
 		return "", fmt.Errorf("error marshaling response: %v", err)
 	}
+
+	// lookup the user account
+	account, err := nk.AccountGetId(ctx, userId)
+	if err != nil {
+		return "", fmt.Errorf("error retrieving account for user %s: %v", userId, err)
+	}
+
+	// get the user metadata for the response
+	var metadata map[string]interface{}
+	if err := json.Unmarshal([]byte(account.User.Metadata), &metadata); err != nil {
+		return "", fmt.Errorf("error unmarshaling metadata: %v", err)
+	}
+	response["metadata"] = metadata
+
 	return string(jsonResponse), nil
 }
 

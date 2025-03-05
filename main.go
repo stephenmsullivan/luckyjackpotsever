@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 
 	"github.com/heroiclabs/nakama-common/runtime"
 )
@@ -17,7 +18,11 @@ func InitModule(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runti
 	CreateLeaderboard("kenocasino_jackpots", ctx, logger, db, nk, initializer)
 
 	// register the RPC calls
-	if err := initializer.RegisterRpc("lookupUserByReferral", lookupUserByReferral); err != nil {
+	if err := initializer.RegisterRpc("LookupUserByReferral", LookupUserByReferral); err != nil {
+		return err
+	}
+
+	if err := initializer.RegisterRpc("UpdateMetadata", UpdateMetadata); err != nil {
 		return err
 	}
 
@@ -72,6 +77,7 @@ func beforeGetAccount(ctx context.Context, logger runtime.Logger, db *sql.DB, nk
 			PermissionRead:  1,
 			PermissionWrite: 1,
 			Value:           `{"userId":"` + userID + `"}`,
+			UserID:          userID,
 		},
 	}); err != nil {
 		logger.Error("sessionCreated: error writing referral code to storage: %v", err)
@@ -86,4 +92,23 @@ func beforeGetAccount(ctx context.Context, logger runtime.Logger, db *sql.DB, nk
 
 	logger.Info("sessionCreated: set referralCode for user %s: %s", userID, newCode)
 	return nil
+}
+
+func UpdateMetadata(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, payload string) (string, error) {
+	userId, ok := ctx.Value(runtime.RUNTIME_CTX_USER_ID).(string)
+	if !ok {
+		return "", errors.New("could not get user ID from context")
+	}
+
+	// Update the user's metadata with the new profile information
+
+	if err := nk.AccountUpdateId(ctx, userId, "", map[string]interface{}{
+		"title": "Definitely Not The Imposter",
+		"hat":   "space_helmet",
+		"skin":  "alien",
+	}, "", "", "", "", ""); err != nil {
+		return "", errors.New("could not update account")
+	}
+
+	return "{}", nil
 }
